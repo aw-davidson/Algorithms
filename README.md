@@ -1,3 +1,20 @@
+<!-- TOC -->
+1. [Big O](#big-o)
+2. [Data Structures](#data-structures)
+3. [Binary Search](#binary-search)
+4. [Greediness](#greediness)
+5. [Sorting](#sorting)
+6. [Searching](#searching)
+7. [divide-and-conquer](#divide-and-conquer)
+8. [dynamic programming](#dynamic-programming)
+9. [memoization](#memoization)
+10. [recursion](#recursion)
+11. [Math](#math)
+12. [Djikstra's](#djikstras)
+13. [A*](#a)
+14. [Large Scale Design](#large-scale-design)
+15. [Operating Systems](#operating-systems)
+
 #### Big O
 
 - Best Cast, Worst Case, Average Case
