@@ -16,20 +16,29 @@
 14. [Large Scale Design](#large-scale-design)
 15. [Operating Systems](#operating-systems)
 
-#### Big O
+## Big O
 
-- Best Cast, Worst Case, Average Case
+Think about N being large. What happens in the **worst case**? Drop all the constants. Computer scientists are pessimistic people because they focus on the worst cases :).
 
-- Drop the constants
+### Amortized time
 
-- Common Runtime Complexities
-  O(1) - The algorithm complexity does not depend on the input
-  O(logN) - Binary search is the most common algorithm with the runtime logN. Anytime the data set is being halved on each iteration of the algorithm we will see a logarithmic runtime.
-  O(N) - Linear time algorithms appear whenever we need to iterate over the entire data set.
-  O(NlogN) - Comparison sorting algorithms have an NlogN complexity.
-  O(N^2) - Nested for loops, where the data set is iterated n times for n elements.
-  O(2^N) - When you have a recursive algorithm that makes multiples calls, the runtime will often look like O(branches^depth) where branches is the number of times each recursive call branches out.
-  O(!N) - factorial or combinatorial complexity appear commonly in permutation problems and grow very very fast.
+We can also talk about runtime being amortized or averaged. For example, ArrayLists in Java are dynamically growing arrays. For most purposes we say the Big O of pushing onto an ArrayList is constant. However, sometimes the ArrayList needs to grows. In this case, all of the elements are copied from one Array to another Array, and this takes O(n) time. Why then do we not say that adding to an ArrayList is O(n) time? Because the growing operation is amortized over all of the array pushes. Each element is pushed once and copied once. Thus, the growing operation is amortized over the pushing.
+
+### Common Runtime Complexities
+
+**O(1)** The algorithm complexity does not depend on the input.
+
+**O(logN)** Algorithms that effectively halve the input with each subroutine will have this runtime.
+
+**O(N)** Linear time algorithms scale directly with the input
+
+**O(NlogN)** Comparison sorting algorithms have an NlogN complexity.
+
+**O(N^2)** Two nested for loops would have this runtime.
+
+**O(2^N)** Algorithms that need to solve subproblems of problems or generate permutations will often look like O(branches^depth) where branches is the number of times each recursive call branches out. 
+
+**O(!N)** Factorial or combinatorial complexity appear commonly in permutation problems and grow very very fast.
 
 | Input (items) | O(1) | O(logN) | O(N) | O(NlogN) | O(N^2) | O(2^N)  | O(N!)    |
 | ------------- | ---- | ------- | ---- | -------- | ------ | ------- | -------- |
@@ -68,10 +77,6 @@ function swap(nums, i, j) {
   [nums[i], nums[j]] = [nums[j], nums[i]];
 }
 ```
-
-- Space Complexities
-
-- Amortized time
 
 #### Data Structures
 
