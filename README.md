@@ -586,15 +586,189 @@ var countSmaller = function(nums) {
 
 #### divide-and-conquer
 
+# top down 
+
+```javascript
+function memo (fn) { // NOTE: args should be primitive data types like Numbers, Booleans, and Strings
+    let cache = {}
+    return function memoized(...args) {
+        let key = args.join('|')
+        if (cache[key]) return cache[key]
+
+        let result = fn(...args)
+        cache[key] = result
+
+        return result
+    }
+}
+```
+
 # Dynamic Programming
 
 When a problem statement includes any words like 'substring', 'subsequence', or 'subarray' you should automatically think dynamic programming! You should also think of dynamic programming when the problem can be solved by solving sub problems. That is to say that problem[i] can be solved by using problem[i - 1] or any previous sub problems like problem at i - n.
 
-When the subproblem always includes 0, solve the sub problem 0 and continue to 0 - 1 and 0 - n, until the array is solved. For many problems, the sub problem will go from i to j, in which case the matrix[i][j] will need to be solved. 
+Dynamic programming is about recognizing duplicated work and caching the results to speed up an algorithms performance. For example, fibonacci can be computed with a simple recursive algorithm with O(2^N) runtime. However, If we cache the duplicated function calls, we can drastically speed up the performance to O(N) runtime.
 
-This matrix can be solved in a number of ways. Often the solution is the bottom right corner or top right corner. Building up solutions will involve traversing the matrix. The most common problems traverse the matrix normally from left to right and top to bottom, but some need to be traversed diagonally, or some other way. For example: https://leetcode.com/problems/longest-palindromic-subsequence/discuss/409591/javascript-dp-with-comments 
+There are two uses for dynamic programming:
 
-Dynamic programming is about recognizing duplicated work and caching the results to speed up an algorithms performance. For example, fibonacci can be computed with a simple recursive algorithm with O(2^N) runtime without dynamic programming. However, If we cache the duplicated function calls, we can drastically speed up the performance to O(N) runtime.
+1. When a problem asks to calculate an optimal solution. For example, maximize the points scored, or minimize the cost.
+2. When a problem asks to calculate the number of ways or paths there are to achieve a given state. For example, count the paths to get from start to finish.
+
+### Dynamic programming problems can be solved in three steps:
+
+Dynamic programming is not about solving matrixes or memorizing recurrence relationships - **it is about breaking the problem down into sub problems and building up a solution from reasonable base cases.**
+
+1. Discern the variables involved in the problem and formalize their relationship to the desired output
+2. Solve the base cases of the problem
+3. Solve the recurrence relation between a problem and its sub problems
+
+### top-down vs bottom up
+start with recursive and then memoize and then go bottom up and use tabulation
+
+### Reducing Space Requirements
+
+Often times the recurrence relation will only rely on the current row or the row above the current row. Problems such as these do not require an entire n by m matrix and an array of length n or m can be used instead. In these cases remember these two rules:
+
+1. iterating from left to right means `dp[i][j] = dp[i][j-nums[i-1]])`
+2. iterating form right to left means `dp[i][j] = dp[i-1][j-nums[i-1]]`
+
+### (COME BACK TO) When does dp[i][j] stand for max and min and when does it stand for using this value (i.e.) max including value at i
+### diagonal traversal vs traversing backwards
+https://leetcode.com/problems/palindromic-substrings/discuss/105707/Java-Python-DP-solution-based-on-longest-palindromic-substring
+```javascript
+var longestPalindromeSubseq = function(s) {
+    if (!s || !s.length) return 0
+    const n = s.length
+    const dp = Array.from({length: n }, () => Array.from({ length: n }, () => 0))
+    
+    for (let i = 0; i < n; i++) {
+        dp[i][i] = 1
+    }
+    
+    for (let col = 1; col < n; col++) {
+        for (let i = 0, j = col; j < n; i++, j++) {
+            if (s[i] === s[j]) {
+                dp[i][j] = dp[i + 1][j - 1] + 2
+            } else {
+                dp[i][j] = Math.max(dp[i][j - 1], dp[i + 1][j])
+            }
+        }
+    }
+
+    return dp[0][n - 1]
+};
+```
+
+### When Order Matters
+
+Given an integer array with all positive numbers and no duplicates, find the number of possible combinations that add up to a positive integer target.
+
+Example:
+
+nums = [1, 2, 3]
+target = 4
+
+The possible combination ways are:
+(1, 1, 1, 1)
+(1, 1, 2)
+(1, 2, 1)
+(1, 3)
+(2, 1, 1)
+(2, 2)
+(3, 1)
+
+Note that different sequences are counted as different combinations.
+
+Therefore the output is 7.
+
+order-1
+calculate the number of combinations considering different sequences
+```java
+for each sum in dp[]
+    for each num in nums[]
+        if (sum >= num)
+            dp[sum] += dp[sum-num];
+```
+
+order-2
+calculate the number of combinations NOT considering different sequences
+```java
+for each num in nums[]
+    for each sum in dp[]  >= num
+        dp[sum] += dp[sum-num];
+```
+
+Give an example nums[] = {1, 2, 3}, target = 4
+order-1 considers the number of combinations starting from 1, 2, and 3, respectively, so all sequences are considered as the graph below.
+
+1 --> 1 --> 1 --> 1 --> (0)
+1 --> 1 --> 2 --> (0)
+1 --> 2 --> 1 --> (0)
+1 --> 3 --> (0)
+
+2 --> 1 --> 1 --> (0)
+2 --> 2 --> (0)
+
+3 --> 1 --> (0)
+
+order-2 considers the number of combinations starting from 0 (i.e., not picking anyone), and the index of the num picked next must be >= the index of previous picked num, so different sequences are not considered, as the graph below.
+
+(0) --> 1 --> 1 --> 1 --> 1
+(0) --> 1 --> 1 --> 2
+(0) --> 1 --> 3
+(0) --> 2 --> 2
+
+## Simplifying our code for dp
+
+Watch out for accessing arrays and strings with index -1. When you have a recurrence such as `dp[i] = dp[i - 1]` the loop with this expression should start at i = 1 not i = 0. It is often much easier to create a dp table that has some padding in the form of an extra row or column than it is to initialize the first rows and columns manually with a loop or by safeguarding with multiple if statements. 
+
+Here is a good example problem where padding greatly reduces the amount of code:
+
+https://leetcode.com/problems/longest-common-subsequence/
+```javascript
+var longestCommonSubsequence = function(text1, text2) {
+    const n = text1.length
+    const m = text2.length
+
+    const dp = Array.from({length: n + 1}, () => Array.from({length: m + 1}, () => 0))
+
+    for (let i = 1; i <= n; i++) {
+        for (let j = 1; j <= m; j++) {
+            if (text1[i - 1] === text2[j - 1]) { // this is subtle, but important. dp[i][j] corresponds to text1[i - 1] and text2[j - 1]
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1])
+            }
+        }
+    }
+
+    return dp[n][m]
+};
+```
+
+## Large answers
+
+Often times when a problem asks to calculate the number of ways, the output can be very large and will not always fit into a 32 bit signed integer. In these cases it is not required to calculate the exact answer but it is enough to give the answer modulo m, where m, for example is 10 ^ 7 + 9. Returned values and cached values will need to be modded by m.
+
+## Dynamic Programming Patterns
+
+### 0/1 Knapsack Problem
+
+Multiple dynamic programming problems can be reduced to a 0/1 knapsack problem. The problem statement is as follows: Given a set of items, each with a weight and a value, determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible. The 0/1 comes from the inclusion of an item being binary - it is included or it is not included. The alternative would be a problem that allows taking a fraction of an item. Then we just sort based on value and fill the knapsack with the most valuable items. If an item cannot fit, then we take a fraction of it.
+
+Since this is the 0–1 knapsack problem, we can either include an item in our knapsack or exclude it, but not include a fraction of it, or include it multiple times.
+
+https://leetcode.com/problems/coin-change-2/
+```java
+dp[0][0] = 1;
+
+for (int i = 1; i <= coins.length; i++) {
+    dp[i][0] = 1;
+    for (int j = 1; j <= amount; j++) {
+        dp[i][j] = dp[i-1][j] + (j >= coins[i-1] ? dp[i][j-coins[i-1]] : 0);
+    }
+}
+```
 
 
 ### Kadane's algorithm
